@@ -36,6 +36,13 @@ function getActions(id) {
   });
 }
 
+function getActionContexts(id) {
+  return db("contexts")
+  .select('contexts.description')
+  .where("actions_id", id)
+  .join("action_contexts", 'action_contexts.contexts_id', '=', 'contexts.id')
+}
+
 function getProjects(id) {
   let query = db("projects");
 
