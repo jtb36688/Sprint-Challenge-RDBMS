@@ -52,21 +52,45 @@ server.get("/api/projects/:id", (req, res) => {
 });
 
 server.delete("/api/projects/:id", (req, res) => {
-    const { id } = req.params;
-    db.removeProject(id)
-      .then(remove => {
-        if (remove) {
-          res.status(200).json({ message: "successful delete" });
-        } else {
-          res.status(404).json({
-            errormessage: "Unable to find any entry matching the provided ID"
-          });
-        }
-      })
-      .catch(({ code, message }) => {
-        res.status(code).json({ message });
-      });
-  });
+  const { id } = req.params;
+  db.removeProject(id)
+    .then(remove => {
+      if (remove) {
+        res.status(200).json({ message: "successful delete" });
+      } else {
+        res.status(404).json({
+          errormessage: "Unable to find any entry matching the provided ID"
+        });
+      }
+    })
+    .catch(({ code, message }) => {
+      res.status(code).json({ message });
+    });
+});
+
+server.put("/api/projects/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, description, completed } = req.body;
+  const changes = { name, description, completed };
+  if (!name) {
+    return res
+      .status(400)
+      .json({ error: "Please provide a name in your changes" });
+  }
+  db.modifyProject(id, changes)
+    .then(updated => {
+      if (updated) {
+        res.status(200).json(updated);
+      } else {
+        res.status(404).json({
+          errormessage: "Unable to find entry matching the provided ID"
+        });
+      }
+    })
+    .catch(({ code, message }) => {
+      res.status(code).json({ message });
+    });
+});
 
 server.post("/api/actions", (req, res) => {
   const { project_id, description, notes, completed } = req.body;
@@ -74,7 +98,9 @@ server.post("/api/actions", (req, res) => {
   if (!description || !project_id) {
     return res
       .status(400)
-      .json({ error: "Please provide a description and project ID for your action" });
+      .json({
+        error: "Please provide a description and project ID for your action"
+      });
   }
   db.addAction(addition)
     .then(add => {
@@ -113,21 +139,45 @@ server.get("/api/actions/:id", (req, res) => {
 });
 
 server.delete("/api/actions/:id", (req, res) => {
-    const { id } = req.params;
-    db.removeAction(id)
-      .then(remove => {
-        if (remove) {
-          res.status(200).json({ message: "successful delete" });
-        } else {
-          res.status(404).json({
-            errormessage: "Unable to find any entry matching the provided ID"
-          });
-        }
-      })
-      .catch(({ code, message }) => {
-        res.status(code).json({ message });
-      });
-  });
+  const { id } = req.params;
+  db.removeAction(id)
+    .then(remove => {
+      if (remove) {
+        res.status(200).json({ message: "successful delete" });
+      } else {
+        res.status(404).json({
+          errormessage: "Unable to find any entry matching the provided ID"
+        });
+      }
+    })
+    .catch(({ code, message }) => {
+      res.status(code).json({ message });
+    });
+});
+
+server.put("/api/actions/:id", (req, res) => {
+  const { id } = req.params;
+  const { project_id, notes, description, completed } = req.body;
+  const changes = { project_id, notes, description, completed };
+  if (!description || !project_id) {
+    return res
+      .status(400)
+      .json({ error: "Please provide a description and project_id in your changes" });
+  }
+  db.modifyAction(id, changes)
+    .then(updated => {
+      if (updated) {
+        res.status(200).json(updated);
+      } else {
+        res.status(404).json({
+          errormessage: "Unable to find entry matching the provided ID"
+        });
+      }
+    })
+    .catch(({ code, message }) => {
+      res.status(code).json({ message });
+    });
+});
 
 const port = 3300;
 server.listen(port, function() {

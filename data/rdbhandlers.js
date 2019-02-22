@@ -9,7 +9,8 @@ module.exports = {
   modifyProject,
   addAction,
   getActions,
-  removeAction
+  removeAction,
+  modifyAction
 };
 
 function addProject(request) {
@@ -86,7 +87,7 @@ async function modifyProject(id, request) {
     .where("id", Number(id))
     .update(request);
   if (conditional) {
-    return getById(id);
+    return getProjects(id);
   } else {
     return null;
   }
@@ -95,6 +96,18 @@ async function modifyProject(id, request) {
 function addAction(request) {
   return db("actions").insert(request);
 }
+
+async function modifyAction(id, request) {
+  const conditional = await db("actions")
+    .where("id", Number(id))
+    .update(request);
+  if (conditional) {
+    return getActions(id);
+  } else {
+    return null;
+  }
+}
+
 
 function ProjectToBody(project) {
   const result = {
