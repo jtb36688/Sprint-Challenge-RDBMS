@@ -18,9 +18,31 @@ exports.up = function(knex, Promise) {
       column.string("description", 256).notNullable()
       column.string("notes", 256)
       column.boolean("completed")
+      .createTable("contexts")
+      column.increments()
+      column.string("description", 256).notNullable()
+      .createTable("action_contexts")
+      column
+        .integer("actions_id")
+        .unsigned()
+        .references("id")
+        .inTable("actions")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+      column
+        .integer("contexts_id")
+        .unsigned()
+        .references("id")
+        .inTable("contexts")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
     });
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema.dropTableIfExists("projects").dropTableIfExists("actions");
+  return knex.schema
+  .dropTableIfExists("projects")
+  .dropTableIfExists("actions")
+  .dropTableIfExists("contexts")
+  .dropTableIfExists("action_contexts")
 };
