@@ -8,7 +8,8 @@ module.exports = {
   removeProject,
   modifyProject,
   addAction,
-  getActions
+  getActions,
+  removeAction
 };
 
 function addProject(request) {
@@ -48,6 +49,12 @@ function removeProject(id) {
     .where({ id: id })
     .del();
 }
+
+function removeAction(id) {
+    return db("actions")
+      .where({ id: id })
+      .del();
+  }
 
 async function modifyProject(id, request) {
   const conditional = await db('projects')
