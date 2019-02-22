@@ -18,10 +18,12 @@ exports.up = function(knex, Promise) {
       column.string("description", 256).notNullable()
       column.string("notes", 256)
       column.boolean("completed")
-      .createTable("contexts")
+    })
+      .createTable("contexts", column => {
       column.increments()
       column.string("description", 256).notNullable()
-      .createTable("action_contexts")
+      })
+      .createTable("action_contexts", column => {
       column
         .integer("actions_id")
         .unsigned()

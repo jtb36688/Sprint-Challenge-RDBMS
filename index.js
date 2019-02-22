@@ -95,6 +95,23 @@ server.get("/api/actions", (req, res) => {
     });
 });
 
+server.get("/api/actions/:id", (req, res) => {
+  const { id } = req.params;
+  db.getActions(id)
+    .then(found => {
+      if (found) {
+        res.status(200).json(found);
+      } else {
+        res.status(404).json({
+          error: "Unable to find any actions matching ID"
+        });
+      }
+    })
+    .catch(({ code, message }) => {
+      res.status(code).json({ message });
+    });
+});
+
 server.delete("/api/actions/:id", (req, res) => {
     const { id } = req.params;
     db.removeAction(id)
