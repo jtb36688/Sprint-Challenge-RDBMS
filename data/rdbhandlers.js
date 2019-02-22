@@ -8,11 +8,15 @@ module.exports = {
   removeProject,
   modifyProject,
   addAction,
-  getAction
+  getActions
 };
 
 function addProject(request) {
   return db("projects").insert(request);
+}
+
+function getActions() {
+    return db("actions")
 }
 
 function getProjects(id) {
@@ -20,7 +24,7 @@ function getProjects(id) {
 
   if (id && id > 0) {
     query.where("id", id).first();
-    return Promise.all([query, this.getProjectActions(id)]).then(results => {
+    return Promise.all([query, getProjectActions(id)]).then(results => {
       let [Project, Actions] = results;
       if (Project) {
         Project.Actions = Actions;
@@ -76,7 +80,9 @@ function ProjectToBody(project) {
 
 function ActionToBody(action) {
     return {
-      ...action,
+      id: action.id,
+      description: action.description,
+      notes: action.notes,
       completed: intToBoolean(action.completed),
     };
   }
