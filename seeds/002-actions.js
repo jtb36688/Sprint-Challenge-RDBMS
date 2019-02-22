@@ -33,7 +33,7 @@ exports.seed = function(knex, Promise) {
           project_id: 3,
           description: "Projects",
           notes: "beginner",
-          completed: true
+          completed: false
         },
         {
           project_id: 3,
