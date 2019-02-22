@@ -8,6 +8,13 @@ exports.up = function(knex, Promise) {
     })
     .createTable("actions", column => {
       column.increments();
+      column
+        .integer("project_id")
+        .unsigned()
+        .references("id")
+        .inTable("projects")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
       column.string("description", 256).notNullable();
       column.string("notes", 256);
       column.boolean("completed");
@@ -15,7 +22,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema
-  .dropTableIfExists("projects")
-  .dropTableIfExists("actions");
+  return knex.schema.dropTableIfExists("projects").dropTableIfExists("actions");
 };
