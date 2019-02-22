@@ -16,8 +16,24 @@ function addProject(request) {
   return db("projects").insert(request);
 }
 
-function getActions() {
-    return db("actions")
+function getActions(id) {
+  let query = db("actions");
+
+  if (id && id > 0) {
+    query.where("id", id).first();
+    return Promise.all([query, getActionContexts(id)]).then(results => {
+      let [action, contexts] = results;
+      if (action) {
+        action.contexts = contexts;
+        return ActionToBody(action);
+      } else {
+        return null;
+      }
+    });
+  }
+  return query.then(actions => {
+    return actions.map(action => ActionToBody(action));
+  });
 }
 
 function getProjects(id) {
@@ -35,7 +51,9 @@ function getProjects(id) {
       }
     });
   }
-  return query;
+  return query.then(projects => {
+    return projects.map(project => ProjectToBody(project));
+  });
 }
 
 function getProjectActions(id) {
@@ -51,13 +69,13 @@ function removeProject(id) {
 }
 
 function removeAction(id) {
-    return db("actions")
-      .where({ id: id })
-      .del();
-  }
+  return db("actions")
+    .where({ id: id })
+    .del();
+}
 
 async function modifyProject(id, request) {
-  const conditional = await db('projects')
+  const conditional = await db("projects")
     .where("id", Number(id))
     .update(request);
   if (conditional) {
@@ -68,32 +86,39 @@ async function modifyProject(id, request) {
 }
 
 function addAction(request) {
-    return db("actions").insert(request)
+  return db("actions").insert(request);
 }
 
 function ProjectToBody(project) {
   const result = {
     ...project,
-    completed: intToBoolean(project.completed),
+    completed: intToBoolean(project.completed)
   };
   if (project.actions) {
     result.Actions = project.actions.map(action => ({
       ...action,
-      completed: intToBoolean(action.completed),
+      completed: intToBoolean(action.completed)
     }));
   }
   return result;
 }
 
 function ActionToBody(action) {
-    return {
-      id: action.id,
-      description: action.description,
-      notes: action.notes,
-      completed: intToBoolean(action.completed),
-    };
-  }
+  const result = {
+    id: action.id,
+    description: action.description,
+    notes: action.notes,
+    completed: intToBoolean(action.completed)
+  };
 
-  function intToBoolean(int) {
-    return int === 1 ? true : false
+  if (action.contexts) {
+    result.contexts = action.contexts.map(context => ({
+      ...context
+    }));
   }
+  return result;
+}
+
+function intToBoolean(int) {
+  return int === 1 ? true : false;
+}
